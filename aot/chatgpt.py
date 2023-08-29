@@ -1,164 +1,191 @@
-# Copyright (c) 2023 ETH Zurich.
-#                    All rights reserved.
-#
-# Use of this source code is governed by a BSD-style license that can be
-# found in the LICENSE file.
-#
-# main author: Nils Blach
-#https://github.com/spcl/graph-of-thoughts/blob/main/graph_of_thoughts/controller/chatgpt.py
-
-import backoff
-import openai
 import os
-import random
+import openai
 import time
-from typing import List, Dict, Union
+
+import logging 
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 
-
-class ChatGPT:
-    """
-    The ChatGPT class handles interactions with the OpenAI models using the provided configuration.
-
-    Inherits from the AbstractLanguageModel and implements its abstract methods.
-    """
-
-    def __init__(
-        self, 
-        config_path: str = "", 
-        model_name: str = "chatgpt", 
-        cache: bool = False
-    ) -> None:
-        """
-        Initialize the ChatGPT instance with configuration, model details, and caching options.
-
-        :param config_path: Path to the configuration file. Defaults to "".
-        :type config_path: str
-        :param model_name: Name of the model, default is 'chatgpt'. Used to select the correct configuration.
-        :type model_name: str
-        :param cache: Flag to determine whether to cache responses. Defaults to False.
-        :type cache: bool
-        """
-        super().__init__(config_path, model_name, cache)
-        self.config: Dict = self.config[model_name]
-        # The model_id is the id of the model that is used for chatgpt, i.e. gpt-4, gpt-3.5-turbo, etc.
-        self.model_id: str = self.config["model_id"]
-        # The prompt_token_cost and response_token_cost are the costs for 1000 prompt tokens and 1000 response tokens respectively.
-        self.prompt_token_cost: float = self.config["prompt_token_cost"]
-        self.response_token_cost: float = self.config["response_token_cost"]
-        # The temperature of a model is defined as the randomness of the model's output.
-        self.temperature: float = self.config["temperature"]
-        # The maximum number of tokens to generate in the chat completion.
-        self.max_tokens: int = self.config["max_tokens"]
-        # The stop sequence is a sequence of tokens that the model will stop generating at (it will not generate the stop sequence).
-        self.stop: Union[str, List[str]] = self.config["stop"]
-        # The account organization is the organization that is used for chatgpt.
-        self.organization: str = self.config["organization"]
-        if self.organization == "":
-            self.logger.warning("OPENAI_ORGANIZATION is not set")
+class OpenAILanguageModel:
+    def __init__(self, 
+            api_key, strategy="cot", 
+            evaluation_strategy="value", 
+            api_base="", 
+            api_model=""):
+        if api_key == "" or api_key is None:
+            api_key = os.environ.get("OPENAI_API_KEY", "")
+        if api_key != "":
+            openai.api_key = api_key
         else:
-            openai.organization = self.organization
-        # The api key is the api key that is used for chatgpt. Env variable OPENAI_API_KEY takes precedence over config.
-        self.api_key: str = os.getenv("OPENAI_API_KEY", self.config["api_key"])
-        if self.api_key == "":
-            raise ValueError("OPENAI_API_KEY is not set")
-        openai.api_key = self.api_key
+            raise Exception("Please provide OpenAI API key")
+
+        if api_base == ""or api_base is None:
+            api_base = os.environ.get("OPENAI_API_BASE", "")  # if not set, use the default base path of "https://api.openai.com/v1"
+        if api_base != "":
+            # e.g. https://api.openai.com/v1/ or your custom url
+            openai.api_base = api_base
+            print(f'Using custom api_base {api_base}')
+            
+        if api_model == "" or api_model is None:
+            api_model = os.environ.get("OPENAI_API_MODEL", "")
+        if api_model != "":
+            self.api_model = api_model
+        else:
+            self.api_model = "text-davinci-003"
+        print(f'Using api_model {self.api_model}')
+
+        self.use_chat_api = 'gpt' in self.api_model
+        self.strategy = strategy
+        self.evaluation_strategy = evaluation_strategy
 
     def run(self, 
-            query: str, 
-            num_responses: int = 1) -> Dict:
-        """
-        Query the OpenAI model for responses.
-
-        :param query: The query to be posed to the language model.
-        :type query: str
-        :param num_responses: Number of desired responses, default is 1.
-        :type num_responses: int
-        :return: Response(s) from the OpenAI model.
-        :rtype: Dict
-        """
-        if self.cache and query in self.respone_cache:
-            return self.respone_cache[query]
-
-        if num_responses == 1:
-            response = self.chat([{"role": "user", "content": query}], num_responses)
-        else:
-            response = []
-            next_try = num_responses
-            total_num_attempts = num_responses
-            while num_responses > 0 and total_num_attempts > 0:
-                try:
-                    assert next_try > 0
-                    res = self.chat([{"role": "user", "content": query}], next_try)
-                    response.append(res)
-                    num_responses -= next_try
-                    next_try = min(num_responses, next_try)
-                except Exception as e:
-                    next_try = (next_try + 1) // 2
-                    self.logger.warning(
-                        f"Error in chatgpt: {e}, trying again with {next_try} samples"
+            prompt, 
+            max_tokens, 
+            temperature, 
+            k=1, 
+            stop=None):
+        while True:
+            try:
+                if self.use_chat_api:
+                    messages = [
+                        {
+                            "role": "user",
+                            "content": prompt
+                        }
+                    ]
+                    response = openai.ChatCompletion.create(
+                        model=self.api_model,
+                        messages=messages,
+                        max_tokens=max_tokens,
+                        temperature=temperature,
                     )
-                    time.sleep(random.randint(1, 3))
-                    total_num_attempts -= 1
+                else:
+                    response = openai.Completion.create(
+                        engine=self.api_model,
+                        prompt=prompt,
+                        n=k,
+                        max_tokens=max_tokens,
+                        stop=stop,
+                        temperature=temperature,
+                    )
+                with open("openai.logs", 'a') as log_file:
+                    log_file.write("\n" + "-----------" + '\n' +"Prompt : "+ prompt+"\n")
+                return response
+            except openai.error.RateLimitError as e:
+                sleep_duratoin = os.environ.get("OPENAI_RATE_TIMEOUT", 30)
+                print(f'{str(e)}, sleep for {sleep_duratoin}s, set it by env OPENAI_RATE_TIMEOUT')
+                time.sleep(sleep_duratoin)
 
-        if self.cache:
-            self.respone_cache[query] = response
-        return response
+    def openai_choice2text_handler(self, choice):
+        if self.use_chat_api:
+            text = choice['message']['content']
+        else:
+            text = choice.text.strip()
+        return text
+    
+    def generate_text(self, prompt, k):
+        if self.use_chat_api:
+            thoughts = []
+            for _ in range(k):
+                response = self.run(prompt, 400, 0.5, k)
+                text = self.openai_choice2text_handler(response.choices[0])
+                thoughts += [text]
+                # print(f'thoughts: {thoughts}')
+            return thoughts
+            
+        else:
+            response = self.run(prompt, 300, 0.5, k)
+            thoughts = [self.openai_choice2text_handler(choice) for choice in response.choices]
+            return thoughts
 
-    @backoff.on_exception(
-        backoff.expo, openai.error.OpenAIError, max_time=10, max_tries=6
-    )
-    def chat(self, 
-             messages: List[Dict], 
-             num_responses: int = 1) -> Dict:
+
+
+    def generate_thoughts(self, 
+                          state, 
+                          k, 
+                          initial_prompt, 
+                          rejected_solutions=None):
+        if (type(state) == str):
+            state_text = state
+        else:
+            state_text = '\n'.join(state)
+        print("New state generating thought:", state, "\n\n")
+        prompt = f"""
+        Accomplish the task below by decomposing it as many very explicit subtasks as possible, be very explicit and thorough denoted by 
+        a search process, highlighted by markers ‘1’,..., ‘3’ as “first operations” guiding subtree exploration for the OBJECTIVE, 
+        focus on the third subtree exploration. Produce prospective search steps (e.g., the subtree exploration ‘5. 11 + 1’) 
+        and evaluates potential subsequent steps to either progress
+        towards a solution or retrace to another viable subtree then be very thorough 
+        and think atomically then provide solutions for those subtasks, 
+        then return the definitive end result and then summarize it
+
+
+        ########## OBJECTIVE
+        {initial_prompt}
+        ###################
         """
-        Send chat messages to the OpenAI model and retrieves the model's response.
-        Implements backoff on OpenAI error.
+        thoughts = self.generate_text(prompt, k)
+        # print(f"Generated thoughts: {thoughts}")
+        return thoughts
 
-        :param messages: A list of message dictionaries for the chat.
-        :type messages: List[Dict]
-        :param num_responses: Number of desired responses, default is 1.
-        :type num_responses: int
-        :return: The OpenAI model's response.
-        :rtype: Dict
-        """
-        response = openai.ChatCompletion.create(
-            model=self.model_id,
-            messages=messages,
-            temperature=self.temperature,
-            max_tokens=self.max_tokens,
-            n=num_responses,
-            stop=self.stop,
-        )
+        
+    def generate_solution(self, 
+                          initial_prompt, 
+                          state, 
+                          rejected_solutions=None):
+        try:
+                
+            if isinstance(state, list):
+                state_text = '\n'.join(state)
+            else:
+                state_text = state
+            
+            prompt = f"""
+            Generate a series of solutions to comply with the user's instructions, 
+            you must generate solutions on the basis of determining the most reliable solution in the shortest amount of time, 
+            while taking rejected solutions into account and learning from them. 
+            Considering the reasoning provided:\n\n
+            ###'{state_text}'\n\n###
+            Devise the best possible solution for the task: {initial_prompt}, Here are evaluated solutions that were rejected: 
+            ###{rejected_solutions}###, 
+            complete the {initial_prompt} without making the same mistakes you did with the evaluated rejected solutions. Be simple. Be direct. Provide intuitive solutions as soon as you think of them."""
+            answer = self.generate_text(prompt, 1)
+            print(f'Generated Solution Summary {answer}')
+            return answer
+        except Exception as e:
+            logger.error(f"Error in generate_solutions: {e}")
+            return None
 
-        self.prompt_tokens += response["usage"]["prompt_tokens"]
-        self.completion_tokens += response["usage"]["completion_tokens"]
-        prompt_tokens_k = float(self.prompt_tokens) / 1000.0
-        completion_tokens_k = float(self.completion_tokens) / 1000.0
-        self.cost = (
-            self.prompt_token_cost * prompt_tokens_k
-            + self.response_token_cost * completion_tokens_k
-        )
-        self.logger.info(
-            f"This is the response from chatgpt: {response}"
-            f"\nThis is the cost of the response: {self.cost}"
-        )
-        return response
+    def evaluate_states(self, states, initial_prompt):
+        if not states:
+            return {}
 
-    def get_response_texts(self, 
-                           query_response: Union[List[Dict], Dict]) -> List[str]:
-        """
-        Extract the response texts from the query response.
+        if self.evaluation_strategy == 'value':
+            state_values = {}
+            for state in states:
+                if (type(state) == str):
+                    state_text = state
+                else:
+                    state_text = '\n'.join(state)
+                print("We receive a state of type", type(state), "For state: ", state, "\n\n")
+                prompt = f""" To achieve the following goal: '{initial_prompt}', pessimistically value the context of the past solutions and more importantly the latest generated solution you had AS A FLOAT BETWEEN 0 AND 1\n
+                    Past solutions:\n\n
+                    {state_text}\n       
+                    If the solutions is not making fast progress in achieving the goal, give it a lower score.
+                    Evaluate all solutions AS A FLOAT BETWEEN 0 and 1:\n,  DO NOT RETURN ANYTHING ELSE
+                """
+                response = self.run(prompt, 10, 1)
+                try:
+                    value_text = self.openai_choice2text_handler(response.choices[0])
+                    # print(f'state: {value_text}')
+                    value = float(value_text)
+                    print(f"Evaluated Thought Value: {value}")
+                except ValueError:
+                    value = 0  
+                state_values[state] = value
+            return state_values
 
-        :param query_response: The response dictionary (or list of dictionaries) from the OpenAI model.
-        :type query_response: Union[List[Dict], Dict]
-        :return: List of response strings.
-        :rtype: List[str]
-        """
-        if isinstance(query_response, Dict):
-            query_response = [query_response]
-        return [
-            choice["message"]["content"]
-            for response in query_response
-            for choice in response["choices"]
-        ]
+        else:
+            raise ValueError("Invalid evaluation strategy. Choose 'value' or 'vote'.")

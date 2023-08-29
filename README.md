@@ -14,9 +14,7 @@ The open source implementation of "Algorithm of Thoughts: Enhancing Exploration 
 ```python
 from aot import AoT
 
-aot = AoT()
-
-task = """
+system_prompt = """
 
 Use numbers and basic arithmetic operations (+ - * /) to obtain 24. When
 considering the next steps, do not choose operations that will result in a
@@ -39,18 +37,23 @@ solution.
 14 8 8 2
 """
 
-aot(task)
+
+task = "5 10 5 2 "
+
+
+aot = AoT(task=task, system_prompt=system_prompt)
+aot.run()
 ```
 
 # Todo
-
-- [ ] Decompose Solution
+- [ ] All thoughts over 0.5 are added to cache or longterm vectorstore 
 - [ ] DFS search similiar to tree of thoughts
 - [ ] Propose solutions function
 - [ ] Backtrack to nearest successful states
 - [ ] Implement evaluation strategy similiar to tot with [0.0, 1.0]
 - [ ] Working demo: Conducts search then backtracks through states, provide visuals green text
 - [ ] Streamlit demo
+
 
 ## Citation
 ```

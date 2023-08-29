@@ -4,9 +4,11 @@ focus on the third subtree exploration. Produce prospective search steps (e.g., 
 and evaluates potential subsequent steps to either progress
 towards a solution or retrace to another viable subtree then be very thorough 
 and think atomically then provide solutions for those subtasks, 
-then return the definitive end result and then summarize it
+then return the definitive end result and then summarize it.
+
+And most importantly, do not give up, all objectives have solutions!
 
 
 ########## OBJECTIVE
-ENTER IN YOUR PROMPT
+ENTER IN YOUR TASK
 ##############
