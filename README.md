@@ -42,6 +42,13 @@ solution.
 aot(task)
 ```
 
+# Todo
+
+- [ ] Decompose Solution
+- [ ] DFS search similiar to tree of thoughts
+- [ ] Propose solutions function
+- [ ] Backtrack to nearest successful states
+- [ ] Implement evaluation strategy similiar to tot with [0.0, 1.0]
 
 ## Citation
 ```
