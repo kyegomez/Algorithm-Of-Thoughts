@@ -36,7 +36,7 @@ class OpenAILanguageModel:
         self.strategy = strategy
         self.evaluation_strategy = evaluation_strategy
 
-    def openai_api_call_handler(self, prompt, max_tokens, temperature, k=1, stop=None):
+    def run(self, prompt, max_tokens, temperature, k=1, stop=None):
         while True:
             try:
                 if self.use_chat_api:
@@ -80,14 +80,14 @@ class OpenAILanguageModel:
         if self.use_chat_api:
             thoughts = []
             for _ in range(k):
-                response = self.openai_api_call_handler(prompt, 400, 0.5, k)
+                response = self.run(prompt, 400, 0.5, k)
                 text = self.openai_choice2text_handler(response.choices[0])
                 thoughts += [text]
                 # print(f'thoughts: {thoughts}')
             return thoughts
             
         else:
-            response = self.openai_api_call_handler(prompt, 300, 0.5, k)
+            response = self.run(prompt, 300, 0.5, k)
             thoughts = [self.openai_choice2text_handler(choice) for choice in response.choices]
             return thoughts
 
@@ -160,7 +160,7 @@ class OpenAILanguageModel:
                     If the solutions is not making fast progress in achieving the goal, give it a lower score.
                     Evaluate all solutions AS A FLOAT BETWEEN 0 and 1:\n,  DO NOT RETURN ANYTHING ELSE
                 """
-                response = self.openai_api_call_handler(prompt, 10, 1)
+                response = self.run(prompt, 10, 1)
                 try:
                     value_text = self.openai_choice2text_handler(response.choices[0])
                     # print(f'state: {value_text}')
