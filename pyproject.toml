@@ -3,7 +3,7 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-name = "aot"
+name = "aot-x"
 version = "1.5.2"
 description = "Algorithm of thoughts - Pytorch"
 license = "MIT"
@@ -20,6 +20,11 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3.6"
 ]
+packages = [
+    { include = "aot" },
+    { include = "aot/**/*.py" },
+]
+
 
 [tool.poetry.dependencies]
 python = "^3.6"
