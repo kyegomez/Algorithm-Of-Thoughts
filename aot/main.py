@@ -1,4 +1,5 @@
 #TODO: Implement DFS over thoughts evaluated with a series from 0,1 
+#TODO: All thoughts over 0.5 are added to cache or longterm vectorstore 
 from logging import Logger
 from aot.chatgpt import ChatGPT
 

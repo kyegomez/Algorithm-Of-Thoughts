@@ -43,14 +43,14 @@ aot(task)
 ```
 
 # Todo
-
-- [ ] Decompose Solution
+- [ ] All thoughts over 0.5 are added to cache or longterm vectorstore 
 - [ ] DFS search similiar to tree of thoughts
 - [ ] Propose solutions function
 - [ ] Backtrack to nearest successful states
 - [ ] Implement evaluation strategy similiar to tot with [0.0, 1.0]
 - [ ] Working demo: Conducts search then backtracks through states, provide visuals green text
 - [ ] Streamlit demo
+
 
 ## Citation
 ```
