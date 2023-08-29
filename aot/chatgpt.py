@@ -9,7 +9,11 @@ logger = logging.getLogger(__name__)
 
 
 class OpenAILanguageModel:
-    def __init__(self, api_key, strategy="cot", evaluation_strategy="value", api_base="", api_model=""):
+    def __init__(self, 
+            api_key, strategy="cot", 
+            evaluation_strategy="value", 
+            api_base="", 
+            api_model=""):
         if api_key == "" or api_key is None:
             api_key = os.environ.get("OPENAI_API_KEY", "")
         if api_key != "":
@@ -36,7 +40,12 @@ class OpenAILanguageModel:
         self.strategy = strategy
         self.evaluation_strategy = evaluation_strategy
 
-    def run(self, prompt, max_tokens, temperature, k=1, stop=None):
+    def run(self, 
+            prompt, 
+            max_tokens, 
+            temperature, 
+            k=1, 
+            stop=None):
         while True:
             try:
                 if self.use_chat_api:
@@ -93,7 +102,11 @@ class OpenAILanguageModel:
 
 
 
-    def generate_thoughts(self, state, k, initial_prompt, rejected_solutions=None):
+    def generate_thoughts(self, 
+                          state, 
+                          k, 
+                          initial_prompt, 
+                          rejected_solutions=None):
         if (type(state) == str):
             state_text = state
         else:
@@ -118,7 +131,10 @@ class OpenAILanguageModel:
         return thoughts
 
         
-    def generate_solution(self, initial_prompt, state, rejected_solutions=None):
+    def generate_solution(self, 
+                          initial_prompt, 
+                          state, 
+                          rejected_solutions=None):
         try:
                 
             if isinstance(state, list):
