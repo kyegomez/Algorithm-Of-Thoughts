@@ -72,6 +72,7 @@ class DFS:
             self.dfs(self.initial_prompt, 1)
             best_state, _ = max(self.output, key=lambda x: x[1])
             solution = self.model.generate_solution(self.initial_prompt, best_state)
+            print(f"Solution is {solution}")
             return solution if solution else best_state
         except Exception as e:
             Logger.error(f"Error in tot_dfs: {e}")
@@ -94,9 +95,11 @@ class DFS:
         thoughts = self.model.generate_thoughts(state, self.num_thoughts, self.initial_prompt)
         self.evaluated_thoughts = self.model.evaluate_states(thoughts, self.initial_prompt)
         filtered_thoughts = [thought for thought in thoughts if self.evaluated_thoughts[thought] >= self.pruning_threshold]
+        print(f"filtered_thoughts: {filtered_thoughts}")
         return filtered_thoughts
 
     def evaluate_thought(self, state):
         thought = self.model.generate_thoughts(state, 1, self.initial_prompt)
         value = self.model.evaluate_states([state], self.initial_prompt)[state]
+        print(f"Evaluated thought: {value}")
         return thought, value

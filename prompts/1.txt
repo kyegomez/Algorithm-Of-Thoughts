@@ -8,5 +8,5 @@ then return the definitive end result and then summarize it
 
 
 ########## OBJECTIVE
-ENTER IN YOUR PROMPT
+ENTER IN YOUR TASK
 ##############
