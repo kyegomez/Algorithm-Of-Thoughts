@@ -8,38 +8,5 @@ then return the definitive end result and then summarize it
 
 
 ########## OBJECTIVE
-CLEAN UP THE following code make it cleaner and much simpelr
+ENTER IN YOUR PROMPT
 ##############
-
-
-class TreeofThoughtsDFS(TreeofThoughts):
-    def solve(self, initial_prompt, num_thoughts, max_steps, value_threshold, pruning_threshold=0.5):
-        output = []
-
-        def dfs(state, step):
-            nonlocal output
-            if step > max_steps:
-                thought = self.model.generate_thoughts(state, 1, initial_prompt)
-                value = self.model.evaluate_states({state}, initial_prompt)[state]
-                output.append((thought, value))
-                return
-
-            thoughts = self.model.generate_thoughts(state, self.num_thoughts, initial_prompt)
-            evaluated_thoughts = self.model.evaluate_states({thought: 0 for thought in thoughts}, initial_prompt)
-            filtered_thoughts = [thought for thought in thoughts if evaluated_thoughts[thought] >= self.pruning_threshold]
-
-
-            for next_state in filtered_thoughts:
-                state_value = self.model.evaluate_states({next_state: 0}, initial_prompt)[next_state]
-
-                if state_value > self.value_threshold:
-                    child = (state, next_state) if isinstance(state, str) else (*state, next_state)
-                    dfs(child, step + 1)
-        try:
-            dfs(initial_prompt, 1)
-            best_state, _ = max(output, key=lambda x: x[1])
-            solution = self.model.generate_solution(initial_prompt, best_state)
-            return solution if solution else best_state
-        except Exception as e:
-            logger.error(f"Error in tot_dfs: {e}")
-            return None

@@ -1,4 +1,5 @@
 #TODO: Implement DFS over thoughts evaluated with a series from 0,1 
+from logging import Logger
 from aot.chatgpt import ChatGPT
 
 
@@ -50,3 +51,52 @@ class AoT:
             if self.gauge_promise(solution, expected_result):
                 self.solutions.append(solution)    
         return self.solutions
+    
+
+class DFS:
+    def __init__(self, 
+                 num_thoughts: int = None, 
+                 max_steps: int = None, 
+                 value_threshold: float = None, 
+                 pruning_threshold=0.5,
+                 initial_prompt=None):
+        self.num_thoughts = num_thoughts
+        self.max_steps = max_steps
+        self.value_threshold = value_threshold
+        self.pruning_threshold = pruning_threshold
+        self.initial_prompt = initial_prompt
+        self.output = []
+
+    def solve(self):
+        try:
+            self.dfs(self.initial_prompt, 1)
+            best_state, _ = max(self.output, key=lambda x: x[1])
+            solution = self.model.generate_solution(self.initial_prompt, best_state)
+            return solution if solution else best_state
+        except Exception as e:
+            Logger.error(f"Error in tot_dfs: {e}")
+            raise e
+
+    def dfs(self, state, step):
+        if step > self.max_steps:
+            thought, value = self.evaluate_thought(state)
+            self.output.append((thought, value))
+            return
+
+        thoughts = self.generate_and_filter_thoughts(state)
+        for next_state in thoughts:
+            state_value = self.evaluated_thoughts[next_state]
+            if state_value > self.value_threshold:
+                child = (state, next_state) if isinstance(state, str) else (*state, next_state)
+                self.dfs(child, step + 1)
+
+    def generate_and_filter_thoughts(self, state):
+        thoughts = self.model.generate_thoughts(state, self.num_thoughts, self.initial_prompt)
+        self.evaluated_thoughts = self.model.evaluate_states(thoughts, self.initial_prompt)
+        filtered_thoughts = [thought for thought in thoughts if self.evaluated_thoughts[thought] >= self.pruning_threshold]
+        return filtered_thoughts
+
+    def evaluate_thought(self, state):
+        thought = self.model.generate_thoughts(state, 1, self.initial_prompt)
+        value = self.model.evaluate_states([state], self.initial_prompt)[state]
+        return thought, value
