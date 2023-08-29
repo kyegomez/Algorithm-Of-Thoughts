@@ -1,4 +1,5 @@
-from swarms import OpenAI
+from aot.chatgpt import ChatGPT
+
 
 class AoT:
     def __init__(self,
@@ -19,8 +20,8 @@ class AoT:
     def propose_solutions(self, subproblem):
         #propose solutions to subproblem ussing llm
         print(f"\033[1;33;40m Proposing solutions for: {subproblem}  \n\033[0m") # Yellow color for thoughts
-        llm = OpenAI()
-        response = llm(subproblem)
+        llm = ChatGPT(temperature=0.5, )
+        response = llm.run(subproblem)
         return response
     
     def gauge_promise(self, solution, result):

@@ -1,0 +1,1 @@
+Accomplish X by decomposing it into very explicit subtasks, be very thorough and think atomically then provide solutions for those subtasks, then provide the definitive end result and then summarize it
