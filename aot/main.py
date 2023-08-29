@@ -1,13 +1,14 @@
+#TODO: Implement DFS over thoughts evaluated with a series from 0,1 
 from aot.chatgpt import ChatGPT
 
 
 class AoT:
     def __init__(self,
-                 llm = None,
+                #  llm = None,
                  task: str = None,
                  system_prompt: str = None):
         super(AoT, self).__init__()
-        self.llm = llm
+        self.llm = ChatGPT()
         self.task = task
         self.subproblems = []
         self.solutions = []
@@ -15,13 +16,12 @@ class AoT:
 
     def decompose(self):
         print(f"\033[1;33;40m Decomposing the task: {self.task}  \n\033[0m") # Yellow color for thoughts
-        self.llm.run(f"{self.system_prompt} Your task: {self.task}")
+        self.llm.run(query=f"{self.system_prompt} Your task: {self.task}")
     
     def propose_solutions(self, subproblem):
         #propose solutions to subproblem ussing llm
         print(f"\033[1;33;40m Proposing solutions for: {subproblem}  \n\033[0m") # Yellow color for thoughts
-        llm = ChatGPT(temperature=0.5, )
-        response = llm.run(subproblem)
+        response = self.llm.run(query=subproblem)
         return response
     
     def gauge_promise(self, solution, result):

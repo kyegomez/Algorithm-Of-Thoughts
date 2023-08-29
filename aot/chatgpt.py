@@ -24,7 +24,10 @@ class ChatGPT:
     """
 
     def __init__(
-        self, config_path: str = "", model_name: str = "chatgpt", cache: bool = False
+        self, 
+        config_path: str = "", 
+        model_name: str = "chatgpt", 
+        cache: bool = False
     ) -> None:
         """
         Initialize the ChatGPT instance with configuration, model details, and caching options.
@@ -61,7 +64,9 @@ class ChatGPT:
             raise ValueError("OPENAI_API_KEY is not set")
         openai.api_key = self.api_key
 
-    def run(self, query: str, num_responses: int = 1) -> Dict:
+    def run(self, 
+            query: str, 
+            num_responses: int = 1) -> Dict:
         """
         Query the OpenAI model for responses.
 
@@ -103,7 +108,9 @@ class ChatGPT:
     @backoff.on_exception(
         backoff.expo, openai.error.OpenAIError, max_time=10, max_tries=6
     )
-    def chat(self, messages: List[Dict], num_responses: int = 1) -> Dict:
+    def chat(self, 
+             messages: List[Dict], 
+             num_responses: int = 1) -> Dict:
         """
         Send chat messages to the OpenAI model and retrieves the model's response.
         Implements backoff on OpenAI error.
@@ -138,7 +145,8 @@ class ChatGPT:
         )
         return response
 
-    def get_response_texts(self, query_response: Union[List[Dict], Dict]) -> List[str]:
+    def get_response_texts(self, 
+                           query_response: Union[List[Dict], Dict]) -> List[str]:
         """
         Extract the response texts from the query response.
 
