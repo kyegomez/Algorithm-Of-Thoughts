@@ -27,5 +27,5 @@ solution.
 task = "5 10 5 2 "
 
 
-aot = AoT(system_prompt=system_prompt, task=task)
+aot = AoT(task=task, system_prompt=system_prompt)
 aot.run()
