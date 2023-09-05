@@ -1,7 +1,5 @@
 from aot.main import AoT
 
-# from aot import AoT
-
 task = """
 
 Use numbers and basic arithmetic operations (+ - * /) to obtain 24. When

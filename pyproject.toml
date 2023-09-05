@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "aot-x"
-version = "1.5.2"
+version = "1.5.3"
 description = "Algorithm of thoughts - Pytorch"
 license = "MIT"
 authors = ["Kye Gomez <kye@apac.ai>"]

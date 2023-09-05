@@ -12,9 +12,9 @@ The open source implementation of "Algorithm of Thoughts: Enhancing Exploration 
 
 # Usage
 ```python
-from aot import AoT
+from aot.main import AoT
 
-system_prompt = """
+task = """
 
 Use numbers and basic arithmetic operations (+ - * /) to obtain 24. When
 considering the next steps, do not choose operations that will result in a
@@ -35,14 +35,23 @@ Most importantly, do not give up, all the numbers that will be given has indeed 
 solution.
 
 14 8 8 2
+
+OBJECTIVE
+#########
+5 10 5 2
 """
 
 
-task = "5 10 5 2 "
+dfs = AoT(
+    num_thoughts=2,
+    max_steps=10, 
+    value_threshold=1,
+    initial_prompt=task,
+    openai_api_key="ENETER IN YOUR API KEY"
+)
 
-
-aot = AoT(task=task, system_prompt=system_prompt)
-aot.run()
+result = dfs.solve()
+print(result)
 ```
 
 # Todo
