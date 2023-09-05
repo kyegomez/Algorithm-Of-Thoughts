@@ -1,7 +1,7 @@
 #TODO: Implement DFS over thoughts evaluated with a series from 0,1 
 #TODO: All thoughts over 0.5 are added to cache or longterm vectorstore 
 from logging import Logger
-from aot.chatgpt import ChatGPT
+from aot.openai import ChatGPT
 
 
 class AoT:
@@ -60,10 +60,12 @@ class DFS:
                  max_steps: int = None, 
                  value_threshold: float = None, 
                  pruning_threshold=0.5,
+                 backtracking_threshold=0.4,
                  initial_prompt=None):
         self.num_thoughts = num_thoughts
         self.max_steps = max_steps
         self.value_threshold = value_threshold
+        self.backtracking_threshold = backtracking_threshold
         self.pruning_threshold = pruning_threshold
         self.initial_prompt = initial_prompt
         self.output = []
@@ -91,6 +93,12 @@ class DFS:
             if state_value > self.value_threshold:
                 child = (state, next_state) if isinstance(state, str) else (*state, next_state)
                 self.dfs(child, step + 1)
+
+                #backtracking
+                best_value = max([value for _, value in self.output])
+                if best_value < self.backtracking_threshold:
+                    self.output.pop()
+                    continue
 
     def generate_and_filter_thoughts(self, state):
         thoughts = self.model.generate_thoughts(state, self.num_thoughts, self.initial_prompt)
