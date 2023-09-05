@@ -8,12 +8,15 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 
-class OpenAILanguageModel:
-    def __init__(self, 
-            api_key, strategy="cot", 
+class OpenAI:
+    def __init__(
+            self, 
+            api_key, 
+            strategy="cot", 
             evaluation_strategy="value", 
             api_base="", 
-            api_model=""):
+            api_model="",
+        ):
         if api_key == "" or api_key is None:
             api_key = os.environ.get("OPENAI_API_KEY", "")
         if api_key != "":
@@ -40,12 +43,14 @@ class OpenAILanguageModel:
         self.strategy = strategy
         self.evaluation_strategy = evaluation_strategy
 
-    def run(self, 
+    def run(
+            self, 
             prompt, 
             max_tokens, 
             temperature, 
             k=1, 
-            stop=None):
+            stop=None
+        ):
         while True:
             try:
                 if self.use_chat_api:
@@ -100,13 +105,13 @@ class OpenAILanguageModel:
             thoughts = [self.openai_choice2text_handler(choice) for choice in response.choices]
             return thoughts
 
-
-
-    def generate_thoughts(self, 
-                          state, 
-                          k, 
-                          initial_prompt, 
-                          rejected_solutions=None):
+    def generate_thoughts(
+            self, 
+            state, 
+            k, 
+            initial_prompt, 
+            rejected_solutions=None
+        ):
         if (type(state) == str):
             state_text = state
         else:
