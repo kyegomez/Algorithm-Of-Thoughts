@@ -2,17 +2,17 @@
 
 # Algorithm-Of-Thoughts
 ![Discord](https://img.shields.io/discord/999382051935506503)
-[![Twitter](https://img.shields.io/twitter/url?style=social&url=https%3A%2F%2Fgithub.com%2Fkyegomez%2FAlgorithm-Of-Thoughts)](https://twitter.com/intent/tweet?text=Check%20out%20this%20amazing%20project%20on%20improving%20AI%20reasoning%20-%Algorithm%20of%20Thoughts!%20https://github.com/kyegomez/Algorithm-Of-Thoughts)
+[![Twitter](https://img.shields.io/twitter/url?style=social&url=https%3A%2F%2Fgithub.com%2Fkyegomez%2FAlgorithm-Of-Thoughts)](https://twitter.com/intent/tweet?text=Check%20out%20this%20amazing%20project%20on%20improving%20AI%20reasoning%20-%20Algorithm%20of%20Thoughts!%20https://github.com/kyegomez/Algorithm-Of-Thoughts)
 [![LinkedIn](https://img.shields.io/badge/Share-LinkedIn-blue?style=social&logo=linkedin)](https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fgithub.com%2Fkyegomez%2FAlgorithm-Of-Thoughts)
 [![Facebook](https://img.shields.io/badge/Share-Facebook-blue?style=social&logo=facebook)](https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fgithub.com%2Fkyegomez%2FAlgorithm-Of-Thoughts)
-[![Reddit](https://img.shields.io/badge/Share-Reddit-orange?style=social&logo=reddit)](https://www.reddit.com/submit?url=https%3A%2F%2Fgithub.com%2Fkyegomez%2FAlgorithm-Of-Thoughts&title=Check%20out%20this%20amazing%20project%20on%20improving%20AI%20reasoning%20-%Algorithm%20of%20Thoughts%21)
-[![Hacker News](https://img.shields.io/badge/Share-Hacker%20News-orange?style=social&logo=y-combinator)](https://news.ycombinator.com/submitlink?u=https%3A%2F%2Fgithub.com%2Fkyegomez%2FAlgorithm-Of-Thoughts&t=Check%20out%20this%20amazing%20project%20on%20improving%20AI%20reasoning%20-%Algorithm%20of%20Thoughts%21)
-[![Pinterest](https://img.shields.io/badge/Share-Pinterest-red?style=social&logo=pinterest)](https://pinterest.com/pin/create/button/?url=https%3A%2F%2Fgithub.com%2Fkyegomez%2FAlgorithm-Of-Thoughts&media=https%3A%2F%2Fgithub.com%2Fkyegomez%2FAlgorithm-Of-Thoughts%2Fraw%2Fmain%2FAlgorithm-Of-Thoughts.jpeg&description=Check%20out%20this%20amazing%20project%20on%20improving%20AI%20reasoning%20-%Algorithm%20of%20Thoughts%21)
-[![WhatsApp](https://img.shields.io/badge/Share-WhatsApp-green?style=social&logo=whatsapp)](https://api.whatsapp.com/send?text=Check%20out%20this%20amazing%20project%20on%20improving%20AI%20reasoning%20-%Algorithm%20of%20Thoughts%21%20https%3A%2F%2Fgithub.com%2Fkyegomez%2FAlgorithm-Of-Thoughts)
+[![Reddit](https://img.shields.io/badge/Share-Reddit-orange?style=social&logo=reddit)](https://www.reddit.com/submit?url=https%3A%2F%2Fgithub.com%2Fkyegomez%2FAlgorithm-Of-Thoughts&title=Check%20out%20this%20amazing%20project%20on%20improving%20AI%20reasoning%20-%20Algorithm%20of%20Thoughts%21)
+[![Hacker News](https://img.shields.io/badge/Share-Hacker%20News-orange?style=social&logo=y-combinator)](https://news.ycombinator.com/submitlink?u=https%3A%2F%2Fgithub.com%2Fkyegomez%2FAlgorithm-Of-Thoughts&t=Check%20out%20this%20amazing%20project%20on%20improving%20AI%20reasoning%20-%20Algorithm%20of%20Thoughts%21)
+[![Pinterest](https://img.shields.io/badge/Share-Pinterest-red?style=social&logo=pinterest)](https://pinterest.com/pin/create/button/?url=https%3A%2F%2Fgithub.com%2Fkyegomez%2FAlgorithm-Of-Thoughts&media=https%3A%2F%2Fgithub.com%2Fkyegomez%2FAlgorithm-Of-Thoughts%2Fraw%2Fmain%2FAlgorithm-Of-Thoughts.jpeg&description=Check%20out%20this%20amazing%20project%20on%20improving%20AI%20reasoning%20-%20Algorithm%20of%20Thoughts%21)
+[![WhatsApp](https://img.shields.io/badge/Share-WhatsApp-green?style=social&logo=whatsapp)](https://api.whatsapp.com/send?text=Check%20out%20this%20amazing%20project%20on%20improving%20AI%20reasoning%20-%20Algorithm%20of%20Thoughts%21%20https%3A%2F%2Fgithub.com%2Fkyegomez%2FAlgorithm-Of-Thoughts)
 
 
 ![AOT BANNER](aot.png)
-The open source implementation of "Algorithm of Thoughts: Enhancing Exploration of Ideas in Large Language Models" that increases model reasoning by nearly 80% or 10% more than [tree of thoughts!](https://github.com/kyegomez/Algorithm-Of-Thoughts)
+The open source implementation of "Algorithm of Thoughts: Enhancing Exploration of Ideas in Large Language Models" that increases model reasoning by nearly 80% or 10% more than [Tree of thoughts!](https://github.com/kyegomez/Algorithm-Of-Thoughts)
 
 [Algorithm of Thoughts: Enhancing Exploration of Ideas in Large Language Models](https://arxiv.org/abs/2308.10379)
 
@@ -66,7 +66,7 @@ print(result)
 
 # Todo
 - [ ] All thoughts over 0.5 are added to cache or longterm vectorstore 
-- [ ] DFS search similiar to tree of thoughts
+- [ ] DFS search similiar to Algorithm of thoughts
 - [ ] Propose solutions function
 - [ ] Backtrack to nearest successful states
 - [ ] Implement evaluation strategy similiar to tot with [0.0, 1.0]
