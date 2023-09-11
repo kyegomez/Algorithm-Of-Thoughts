@@ -2,7 +2,7 @@
 
 # Algorithm-Of-Thoughts
 ![AOT BANNER](aot.png)
-The open source implementation of "Algorithm of Thoughts: Enhancing Exploration of Ideas in Large Language Models"
+The open source implementation of "Algorithm of Thoughts: Enhancing Exploration of Ideas in Large Language Models" that increases model reasoning by nearly 80% or 10% more than [tree of thoughts!](https://github.com/kyegomez/tree-of-thoughts)
 
 [Algorithm of Thoughts: Enhancing Exploration of Ideas in Large Language Models](https://arxiv.org/abs/2308.10379)
 
