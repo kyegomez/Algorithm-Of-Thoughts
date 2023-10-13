@@ -2,21 +2,23 @@ import os
 import openai
 import time
 
-import logging 
+import logging
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
 
 
 class OpenAI:
     def __init__(
-            self, 
-            api_key, 
-            strategy="cot", 
-            evaluation_strategy="value", 
-            api_base="", 
-            api_model="",
-        ):
+        self,
+        api_key,
+        strategy="cot",
+        evaluation_strategy="value",
+        api_base="",
+        api_model="",
+    ):
         if api_key == "" or api_key is None:
             api_key = os.environ.get("OPENAI_API_KEY", "")
         if api_key != "":
@@ -24,42 +26,32 @@ class OpenAI:
         else:
             raise Exception("Please provide OpenAI API key")
 
-        if api_base == ""or api_base is None:
-            api_base = os.environ.get("OPENAI_API_BASE", "")  # if not set, use the default base path of "https://api.openai.com/v1"
+        if api_base == "" or api_base is None:
+            api_base = os.environ.get(
+                "OPENAI_API_BASE", ""
+            )  # if not set, use the default base path of "https://api.openai.com/v1"
         if api_base != "":
             # e.g. https://api.openai.com/v1/ or your custom url
             openai.api_base = api_base
-            print(f'Using custom api_base {api_base}')
-            
+            print(f"Using custom api_base {api_base}")
+
         if api_model == "" or api_model is None:
             api_model = os.environ.get("OPENAI_API_MODEL", "")
         if api_model != "":
             self.api_model = api_model
         else:
             self.api_model = "text-davinci-003"
-        print(f'Using api_model {self.api_model}')
+        print(f"Using api_model {self.api_model}")
 
-        self.use_chat_api = 'gpt' in self.api_model
+        self.use_chat_api = "gpt" in self.api_model
         self.strategy = strategy
         self.evaluation_strategy = evaluation_strategy
 
-    def run(
-            self, 
-            prompt, 
-            max_tokens, 
-            temperature, 
-            k=1, 
-            stop=None
-        ):
+    def run(self, prompt, max_tokens, temperature, k=1, stop=None):
         while True:
             try:
                 if self.use_chat_api:
-                    messages = [
-                        {
-                            "role": "user",
-                            "content": prompt
-                        }
-                    ]
+                    messages = [{"role": "user", "content": prompt}]
                     response = openai.ChatCompletion.create(
                         model=self.api_model,
                         messages=messages,
@@ -75,21 +67,25 @@ class OpenAI:
                         stop=stop,
                         temperature=temperature,
                     )
-                with open("openai.logs", 'a') as log_file:
-                    log_file.write("\n" + "-----------" + '\n' +"Prompt : "+ prompt+"\n")
+                with open("openai.logs", "a") as log_file:
+                    log_file.write(
+                        "\n" + "-----------" + "\n" + "Prompt : " + prompt + "\n"
+                    )
                 return response
             except openai.error.RateLimitError as e:
                 sleep_duratoin = os.environ.get("OPENAI_RATE_TIMEOUT", 30)
-                print(f'{str(e)}, sleep for {sleep_duratoin}s, set it by env OPENAI_RATE_TIMEOUT')
+                print(
+                    f"{str(e)}, sleep for {sleep_duratoin}s, set it by env OPENAI_RATE_TIMEOUT"
+                )
                 time.sleep(sleep_duratoin)
 
     def openai_choice2text_handler(self, choice):
         if self.use_chat_api:
-            text = choice['message']['content']
+            text = choice["message"]["content"]
         else:
             text = choice.text.strip()
         return text
-    
+
     def generate_text(self, prompt, k):
         if self.use_chat_api:
             thoughts = []
@@ -99,23 +95,19 @@ class OpenAI:
                 thoughts += [text]
                 # print(f'thoughts: {thoughts}')
             return thoughts
-            
+
         else:
             response = self.run(prompt, 300, 0.5, k)
-            thoughts = [self.openai_choice2text_handler(choice) for choice in response.choices]
+            thoughts = [
+                self.openai_choice2text_handler(choice) for choice in response.choices
+            ]
             return thoughts
 
-    def generate_thoughts(
-            self, 
-            state, 
-            k, 
-            initial_prompt, 
-            rejected_solutions=None
-        ):
-        if (type(state) == str):
+    def generate_thoughts(self, state, k, initial_prompt, rejected_solutions=None):
+        if type(state) == str:
             state_text = state
         else:
-            state_text = '\n'.join(state)
+            state_text = "\n".join(state)
         print("New state generating thought:", state, "\n\n")
         prompt = f"""
         Accomplish the task below by decomposing it as many very explicit subtasks as possible, be very explicit and thorough denoted by 
@@ -135,18 +127,13 @@ class OpenAI:
         # print(f"Generated thoughts: {thoughts}")
         return thoughts
 
-        
-    def generate_solution(self, 
-                          initial_prompt, 
-                          state, 
-                          rejected_solutions=None):
+    def generate_solution(self, initial_prompt, state, rejected_solutions=None):
         try:
-                
             if isinstance(state, list):
-                state_text = '\n'.join(state)
+                state_text = "\n".join(state)
             else:
                 state_text = state
-            
+
             prompt = f"""
             Generate a series of solutions to comply with the user's instructions, 
             you must generate solutions on the basis of determining the most reliable solution in the shortest amount of time, 
@@ -157,7 +144,7 @@ class OpenAI:
             ###{rejected_solutions}###, 
             complete the {initial_prompt} without making the same mistakes you did with the evaluated rejected solutions. Be simple. Be direct. Provide intuitive solutions as soon as you think of them."""
             answer = self.generate_text(prompt, 1)
-            print(f'Generated Solution Summary {answer}')
+            print(f"Generated Solution Summary {answer}")
             return answer
         except Exception as e:
             logger.error(f"Error in generate_solutions: {e}")
@@ -167,14 +154,20 @@ class OpenAI:
         if not states:
             return {}
 
-        if self.evaluation_strategy == 'value':
+        if self.evaluation_strategy == "value":
             state_values = {}
             for state in states:
-                if (type(state) == str):
+                if type(state) == str:
                     state_text = state
                 else:
-                    state_text = '\n'.join(state)
-                print("We receive a state of type", type(state), "For state: ", state, "\n\n")
+                    state_text = "\n".join(state)
+                print(
+                    "We receive a state of type",
+                    type(state),
+                    "For state: ",
+                    state,
+                    "\n\n",
+                )
                 prompt = f""" To achieve the following goal: '{initial_prompt}', pessimistically value the context of the past solutions and more importantly the latest generated solution you had AS A FLOAT BETWEEN 0 AND 1\n
                     Past solutions:\n\n
                     {state_text}\n       
@@ -188,7 +181,7 @@ class OpenAI:
                     value = float(value_text)
                     print(f"Evaluated Thought Value: {value}")
                 except ValueError:
-                    value = 0  
+                    value = 0
                 state_values[state] = value
             return state_values
 

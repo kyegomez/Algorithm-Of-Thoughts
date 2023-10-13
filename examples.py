@@ -30,10 +30,10 @@ OBJECTIVE
 
 dfs = AoT(
     num_thoughts=2,
-    max_steps=10, 
+    max_steps=10,
     value_threshold=1,
     initial_prompt=task,
-    openai_api_key="ENETER IN YOUR API KEY"
+    openai_api_key="ENETER IN YOUR API KEY",
 )
 
 result = dfs.solve()

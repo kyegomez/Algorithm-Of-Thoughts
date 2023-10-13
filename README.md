@@ -66,11 +66,11 @@ print(result)
 
 # Todo
 - [ ] All thoughts over 0.5 are added to cache or longterm vectorstore 
-- [ ] DFS search similiar to Algorithm of thoughts
-- [ ] Propose solutions function
-- [ ] Backtrack to nearest successful states
-- [ ] Implement evaluation strategy similiar to tot with [0.0, 1.0]
-- [ ] Working demo: Conducts search then backtracks through states, provide visuals green text
+- [x] DFS search similiar to Algorithm of thoughts
+- [x] Propose solutions function
+- [x] Backtrack to nearest successful states
+- [x] Implement evaluation strategy similiar to tot with [0.0, 1.0]
+- [x] Working demo: Conducts search then backtracks through states, provide visuals green text
 - [ ] Streamlit demo
 
 

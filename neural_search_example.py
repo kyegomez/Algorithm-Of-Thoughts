@@ -1,7 +1,6 @@
 from aot.main import AoT
 
 
-
 task = "Create GPT-2"
 
 
@@ -66,10 +65,10 @@ After you suggest a design, I will test its actual performance and provide you w
 """
 dfs = AoT(
     num_thoughts=2,
-    max_steps=10, 
+    max_steps=10,
     value_threshold=1,
     initial_prompt=system,
-    openai_api_key="ENETER IN YOUR API KEY"
+    openai_api_key="ENETER IN YOUR API KEY",
 )
 
 result = dfs.solve()
