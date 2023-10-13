@@ -21,10 +21,18 @@ class OpenAI:
     ):
         if api_key == "" or api_key is None:
             api_key = os.environ.get("OPENAI_API_KEY", "")
-        if api_key != "":
-            openai.api_key = api_key
-        else:
+        
+        if api_key == "":
+            try:
+                with open(os.path.expanduser('~/some/defined/path'), 'r') as f:
+                    api_key = f.read().strip()
+            except FileNotFoundError:
+                pass  # Handle the exception as you see fit
+
+        if api_key == "":
             raise Exception("Please provide OpenAI API key")
+        else:
+            openai.api_key = api_key
 
         if api_base == "" or api_base is None:
             api_base = os.environ.get(
@@ -40,7 +48,7 @@ class OpenAI:
         if api_model != "":
             self.api_model = api_model
         else:
-            self.api_model = "text-davinci-003"
+            self.api_model = "gpt-3.5-turbo"
         print(f"Using api_model {self.api_model}")
 
         self.use_chat_api = "gpt" in self.api_model
@@ -160,6 +168,7 @@ class OpenAI:
                 if type(state) == str:
                     state_text = state
                 else:
+                    print(f"state: {state}")
                     state_text = "\n".join(state)
                 print(
                     "We receive a state of type",
