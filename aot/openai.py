@@ -21,10 +21,10 @@ class OpenAI:
     ):
         if api_key == "" or api_key is None:
             api_key = os.environ.get("OPENAI_API_KEY", "")
-        
+
         if api_key == "":
             try:
-                with open(os.path.expanduser('~/some/defined/path'), 'r') as f:
+                with open(os.path.expanduser("~/some/defined/path"), "r") as f:
                     api_key = f.read().strip()
             except FileNotFoundError:
                 pass  # Handle the exception as you see fit

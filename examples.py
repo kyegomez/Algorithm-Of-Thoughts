@@ -2,6 +2,9 @@ from aot.main import AoT
 
 task = """
 
+
+PROMPT
+###################
 Use numbers and basic arithmetic operations (+ - * /) to obtain 24. When
 considering the next steps, do not choose operations that will result in a
 negative or fractional number. In order to help with the calculations, the
@@ -25,15 +28,18 @@ solution.
 OBJECTIVE
 #########
 5 10 5 2
+
+
+###################
 """
 
 
 dfs = AoT(
     num_thoughts=2,
     max_steps=10,
-    value_threshold=1,
+    value_threshold=0.8,
     initial_prompt=task,
-    #openai_api_key="ENETER IN YOUR API KEY",
+    openai_api_key="",
 )
 
 result = dfs.solve()
