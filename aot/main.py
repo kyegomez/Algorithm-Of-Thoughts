@@ -1,20 +1,23 @@
 from aot.openai import OpenAI
 
-import logging 
+import logging
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
+
 
 class AoT:
     def __init__(
-        self, 
-        num_thoughts: int = None, 
-        max_steps: int = None, 
-        value_threshold: float = None, 
+        self,
+        num_thoughts: int = None,
+        max_steps: int = None,
+        value_threshold: float = None,
         pruning_threshold=0.5,
         backtracking_threshold=0.4,
         initial_prompt=None,
-        openai_api_key: str = None
+        openai_api_key: str = None,
     ):
         self.num_thoughts = num_thoughts
         self.max_steps = max_steps
@@ -33,7 +36,7 @@ class AoT:
             if not self.output:
                 logger.error("No valid thoughts were generated during DFS")
                 return None
-            
+
             best_state, _ = max(self.output, key=lambda x: x[1])
             solution = self.model.generate_solution(self.initial_prompt, best_state)
             print(f"Solution is {solution}")
@@ -52,10 +55,14 @@ class AoT:
         for next_state in thoughts:
             state_value = self.evaluated_thoughts[next_state]
             if state_value > self.value_threshold:
-                child = (state, next_state) if isinstance(state, str) else (*state, next_state)
+                child = (
+                    (state, next_state)
+                    if isinstance(state, str)
+                    else (*state, next_state)
+                )
                 self.dfs(child, step + 1)
 
-                #backtracking
+                # backtracking
                 best_value = max([value for _, value in self.output])
                 if best_value < self.backtracking_threshold:
                     self.output.pop()
@@ -63,17 +70,18 @@ class AoT:
 
     def generate_and_filter_thoughts(self, state):
         thoughts = self.model.generate_thoughts(
-            state, 
-            self.num_thoughts, 
-            self.initial_prompt
+            state, self.num_thoughts, self.initial_prompt
         )
 
         self.evaluated_thoughts = self.model.evaluate_states(
-            thoughts, 
-            self.initial_prompt
+            thoughts, self.initial_prompt
         )
 
-        filtered_thoughts = [thought for thought in thoughts if self.evaluated_thoughts[thought] >= self.pruning_threshold]
+        filtered_thoughts = [
+            thought
+            for thought in thoughts
+            if self.evaluated_thoughts[thought] >= self.pruning_threshold
+        ]
         print(f"filtered_thoughts: {filtered_thoughts}")
         return filtered_thoughts
 
